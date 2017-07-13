@@ -12,7 +12,7 @@ import scala.collection.mutable.ListBuffer
   * Created by Administrator on 2017/7/11.
   */
 object UserTopicDemo {
-  val topicList = List("A", "B", "C", "D", "E")
+  val topicList = List("A", "B", "C", "D", "E") //所有topic种类
   val random = new Random()
 
   //生成用户数据
@@ -33,7 +33,7 @@ object UserTopicDemo {
     userList
   }
 
-  //生成用户浏览数据
+  //为每个用户生成浏览数据
   def produceLinks(userId: String, num: Int): ListBuffer[(String, LinkInfo)] = {
     val linkList = new ListBuffer[(String, LinkInfo)]
     for(i <- 1 to num) {
@@ -46,6 +46,7 @@ object UserTopicDemo {
     linkList
   }
 
+  //周期性调用函数来处理过去五分钟产生的事件日志
   def processNewLogs(events: RDD[(String, LinkInfo)], userData: RDD[(String, UserInfo)]): Unit = {
 
     //内连接
@@ -53,6 +54,8 @@ object UserTopicDemo {
 //    println(s"=================用户订阅主题和浏览信息内连接=================")
 //    joined.foreach(println)
     val offTopic = joined.filter {
+
+      //用户访问的未订阅主题
       case (userId, (userInfo, linkInfo)) => !userInfo.topics.contains(linkInfo.topic)
     }
 //    println("=================用户浏览的未订阅主题=================")
@@ -71,10 +74,10 @@ object UserTopicDemo {
     val conf = new SparkConf().setMaster("local").setAppName("userTopic")
     val sc = new SparkContext(conf)
 
-    val startTime = System.currentTimeMillis()
+//    val startTime = System.currentTimeMillis()
 
     //用户总数量
-    val userNum = 5000
+    val userNum = 1600
     val linksList = new ListBuffer[(String, LinkInfo)]
 
     //过去五分钟内访问的用户数量（随机生成）
@@ -92,7 +95,7 @@ object UserTopicDemo {
 
     //自定义分区的方式
     /*val userData = sc.parallelize(userList)
-                      .partitionBy(new HashPartitioner(32)) //构建100个分区
+                      .partitionBy(new HashPartitioner(100)) //构建100个分区
                       .persist()*/
 
     //用户浏览数据
@@ -103,6 +106,8 @@ object UserTopicDemo {
 
 //    println("=================此次五分钟内共有" + currentUserNum + "名用户浏览主题=================")
 
+    val startTime = System.currentTimeMillis()
+
     //周期性调用函数来处理过去五分钟产生的事件日志
     for (i <- 1 to 20) {
       for (i <- 1 to currentUserNum) {
@@ -112,6 +117,7 @@ object UserTopicDemo {
       val events = sc.parallelize(linksList)
       processNewLogs(events, userData)
       linksList.clear()
+//      Thread.sleep(1000 * 60 * 5) //五分钟调用一次
     }
     val endTime = System.currentTimeMillis()
     val takesTime = endTime - startTime
