@@ -86,11 +86,14 @@ object UserTopicDemo {
     val pair2 = ("gavin2", UserInfo(mutable.Set("B", "C", "D")))
     val userData = sc.parallelize(List(pair1, pair2))*/
     val userList = produceUserData(userNum)
-//    val userData = sc.parallelize(userList)
 
+    //原来的方式
     val userData = sc.parallelize(userList)
+
+    //自定义分区的方式
+    /*val userData = sc.parallelize(userList)
                       .partitionBy(new HashPartitioner(32)) //构建100个分区
-                      .persist()
+                      .persist()*/
 
     //用户浏览数据
     /*val linkList1 = produceLinks("gavin1", 8)
@@ -101,7 +104,7 @@ object UserTopicDemo {
 //    println("=================此次五分钟内共有" + currentUserNum + "名用户浏览主题=================")
 
     //周期性调用函数来处理过去五分钟产生的事件日志
-    for (i <- 1 to 200) {
+    for (i <- 1 to 20) {
       for (i <- 1 to currentUserNum) {
         val num = random.nextInt(100) + 1
         linksList ++= produceLinks("gavin" + num, random.nextInt(10) + 1)
