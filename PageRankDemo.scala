@@ -29,10 +29,10 @@ object PageRankDemo {
   def main(args: Array[String]) {
     val conf = new SparkConf().setMaster("local").setAppName("PageRank")
     val sc = new SparkContext(conf)
+//    val links = sc.parallelize(producePageLinks.toList)
     val links = sc.parallelize(producePageLinks.toList)
-    /*val links = sc.parallelize(producePageLinks.toList)
                    .partitionBy(new HashPartitioner(100))
-                   .persist()*/
+                   .persist()
 
     //将每个页面的排序值初始化为1.0；由于使用mapValues，
     //生成的RDD的分区方式会和"links"的一样
