@@ -37,7 +37,6 @@ object JSONDemo {
     val result = readJson2Object(input)(classOf[Person])
     println("==================result====================")
     result.foreach(println)
-
     result.filter(p => p.asInstanceOf[Person].lovesPandas)
       .map(gson.toJson(_)).saveAsTextFile("file:///E:/first/second/lovesPandas")
   }
