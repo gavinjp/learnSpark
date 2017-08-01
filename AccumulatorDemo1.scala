@@ -34,6 +34,10 @@ object AccumulatorDemo1 {
     //创建累加器Accumulator[Int]并初始化为0
     val errorLines = sc.accumulator(0)
     val result = readJson2Object(input, errorLines)(classOf[Person])
+
+    //可能导致计数出现偏差的过程中的行动操作
+//    result.foreach(println)
+    
     result.map(p => {
       if (p == null) {
         println("空行：" + p)
